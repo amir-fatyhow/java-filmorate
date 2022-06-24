@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+    public static final LocalDate FILM_BIRTHDAY = LocalDate.of(1895, 12, 28);
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private Map<Long, Film> films = new HashMap<>();
     private long id = 1;
@@ -26,22 +27,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) {
-        if (film.getName().isBlank()) {
-            log.info("Неверно введено название фильма");
-            throw new ValidationException("Название не может быть пустым.");
-        }
-        if (film.getDescription().length() > 200) {
-            log.info("Описание фильма превышает 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов.");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))){
-            log.info("Дата релиза раньше 28 декабря 1895 года.");
-            throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года.");
-        }
-        if (film.getDuration() <= 0) {
-            log.info("Продолжительность фильма должна быть отрицательная.");
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
+        validation(film);
         film.setId(id);
         id++;
         films.put(film.getId(), film);
@@ -50,26 +36,10 @@ public class FilmController {
 
     @PutMapping
     public Film put(@RequestBody Film film) {
-        if (film.getName().isEmpty()) {
-            log.info("Неверно введено название фильма");
-            throw new ValidationException("Название не может быть пустым.");
-        }
-        if (film.getDescription().length() > 200) {
-            log.info("Описание фильма превышает 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов.");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))){
-            log.info("Дата релиза раньше 28 декабря 1895 года.");
-            throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года.");
-        }
-        if (film.getDuration() <= 0) {
-            log.info("Продолжительность фильма должна быть отрицательная.");
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
-
+        validation(film);
         boolean flag = true;
-        for (long l : films.keySet()) {
-            if (l == film.getId()) {
+        for (long id : films.keySet()) {
+            if (id == film.getId()) {
                 films.put(film.getId(), film);
                 flag = false;
             }
@@ -81,6 +51,25 @@ public class FilmController {
         }
 
         return film;
+    }
+
+    private void validation(Film film) {
+        if (film.getName().isBlank()) {
+            log.info("Неверно введено название фильма");
+            throw new ValidationException("Название не может быть пустым.");
+        }
+        if (film.getDescription().length() > 200) {
+            log.info("Описание фильма превышает 200 символов");
+            throw new ValidationException("Максимальная длина описания — 200 символов.");
+        }
+        if (film.getReleaseDate().isBefore(FILM_BIRTHDAY) || film.getReleaseDate().equals(FILM_BIRTHDAY)){
+            log.info("Дата релиза раньше 28 декабря 1895 года.");
+            throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года.");
+        }
+        if (film.getDuration() <= 0) {
+            log.info("Продолжительность фильма должна быть отрицательная.");
+            throw new ValidationException("Продолжительность фильма должна быть положительной.");
+        }
     }
 }
 
