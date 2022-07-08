@@ -7,15 +7,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.adapter.LocalDateDeserializer;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 class UserTest {
     private String url = "http://localhost:8080/users";
@@ -41,9 +41,10 @@ class UserTest {
 
         makePostRequest(user);
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[]}]",
                 users.toString());
     }
 
@@ -53,16 +54,16 @@ class UserTest {
         User user = new User("email@ru", "login",
                 LocalDate.of(2022, 6, 21), "name");
 
-        User createdUser = returnCreatedFilmAfterPostRequest(user);
+        User createdUser = returnCreatedUserAfterPostRequest(user);
         createdUser.setLogin("updatedLogin");
         createdUser.setName("updatedName");
 
         makePutRequest(createdUser);
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[{id=1, email=email@ru, login=updatedLogin, birthday=2022-06-21, " +
-                        "name=updatedName}]",
+                        "name=updatedName, friends=[]}]",
                 users.toString());
     }
 
@@ -75,7 +76,7 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[]",
                 users.toString());
@@ -90,7 +91,7 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[]",
                 users.toString());
@@ -105,7 +106,7 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[]",
                 users.toString());
@@ -120,7 +121,7 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[]",
                 users.toString());
@@ -135,9 +136,10 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=login}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=login, friends=[]}]",
                 users.toString());
     }
 
@@ -150,7 +152,7 @@ class UserTest {
             makePostRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users =  restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users =  restTemplate.getForEntity(url, Collection.class).getBody();
 
         Assertions.assertEquals("[]",
                 users.toString());
@@ -162,7 +164,7 @@ class UserTest {
                 LocalDate.of(2022, 6, 21), "name");
 
         try {
-            user = returnCreatedFilmAfterPostRequest(user);
+            user = returnCreatedUserAfterPostRequest(user);
         } catch (Throwable ignored){}
 
         user.setEmail("");
@@ -171,9 +173,10 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[]}]",
                 users.toString());
     }
 
@@ -191,9 +194,10 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[]}]",
                 users.toString());
     }
 
@@ -203,7 +207,7 @@ class UserTest {
                 LocalDate.of(2022, 6, 21), "name");
 
         try {
-            user = returnCreatedFilmAfterPostRequest(user);
+            user = returnCreatedUserAfterPostRequest(user);
         } catch (Throwable ignored){}
 
         user.setLogin("");
@@ -212,9 +216,10 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[]}]",
                 users.toString());
     }
 
@@ -233,9 +238,10 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21," +
+                        " name=name, friends=[]}]",
                 users.toString());
     }
 
@@ -245,7 +251,7 @@ class UserTest {
                 LocalDate.of(2022, 6, 21), "name");
 
         try {
-            user = returnCreatedFilmAfterPostRequest(user);
+            user = returnCreatedUserAfterPostRequest(user);
         } catch (Throwable ignored){}
 
         user.setName("");
@@ -254,9 +260,10 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=login}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=login, friends=[]}]",
                 users.toString());
     }
 
@@ -266,7 +273,7 @@ class UserTest {
                 LocalDate.of(2022, 6, 21), "name");
 
         try {
-            user = returnCreatedFilmAfterPostRequest(user);
+            user = returnCreatedUserAfterPostRequest(user);
         } catch (Throwable ignored){}
 
         user.setBirthday(LocalDate.of(2122, 6, 21));
@@ -275,10 +282,228 @@ class UserTest {
             makePutRequest(user);
         } catch (Throwable ignored){}
 
-        Collection<User> users = restTemplate.getForEntity(url, Collection.class).getBody();
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
 
-        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name}]",
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[]}]",
                 users.toString());
+    }
+
+    @Test
+    void shouldGetUserById() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+        String urlFilmId1 = "http://localhost:8080/users/1";
+
+        makePostRequest(user);
+
+        User userById = restTemplate.getForEntity(urlFilmId1, User.class).getBody();
+
+        Assertions.assertEquals("User(id=1, email=email@ru, login=login, birthday=2022-06-21, " +
+                        "name=name, friends=[])",
+                userById.toString());
+    }
+
+    @Test
+    void shouldNotGetUserByIncorrectId() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+        String urlFilmId1 = "http://localhost:8080/users/2";
+
+        makePostRequest(user);
+
+        boolean isGetUserByIncorrectId = true;
+        try {
+            restTemplate.getForEntity(urlFilmId1, User.class).getBody();
+        } catch (Throwable ex){
+            isGetUserByIncorrectId = false;
+        }
+
+        Assertions.assertFalse(isGetUserByIncorrectId);
+    }
+
+    @Test
+    void shouldPutFriend() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friend = new User("friend@ru", "friend",
+                LocalDate.of(2021, 1, 11), "friend");
+
+        makePostRequest(friend);
+        makePutRequestToAddFriend(friend, URI.create("http://localhost:8080/users/1/friends/2"));
+
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
+
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name, " +
+                        "friends=[2]}, {id=2, email=friend@ru, login=friend, birthday=2021-01-11, " +
+                        "name=friend, friends=[1]}]",
+                users.toString());
+    }
+
+    @Test
+    void shouldNotPutFriendByIncorrectId() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friend = new User("friend@ru", "friend",
+                LocalDate.of(2021, 1, 11), "friend");
+
+        makePostRequest(friend);
+
+        try {
+            makePutRequestToAddFriend(friend, URI.create("http://localhost:8080/users/1/friends/3"));
+        } catch (Throwable ignored){}
+
+
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
+
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name, " +
+                        "friends=[]}, {id=2, email=friend@ru, login=friend, birthday=2021-01-11, " +
+                        "name=friend, friends=[]}]",
+                users.toString());
+    }
+
+    @Test
+    void shouldDeleteFriend() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friend = new User("friend@ru", "friend",
+                LocalDate.of(2021, 1, 11), "friend");
+
+        makePostRequest(friend);
+        deleteFriend(user, URI.create("http://localhost:8080/users/1/friends/2"));
+
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
+
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name, " +
+                        "friends=[]}, {id=2, email=friend@ru, login=friend, birthday=2021-01-11, " +
+                        "name=friend, friends=[]}]",
+                users.toString());
+    }
+
+    @Test
+    void shouldNotDeleteFriendByIncorrectId() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friend = new User("friend@ru", "friend",
+                LocalDate.of(2021, 1, 11), "friend");
+
+        makePostRequest(friend);
+        makePutRequestToAddFriend(friend, URI.create("http://localhost:8080/users/1/friends/2"));
+
+        try {
+            deleteFriend(user, URI.create("http://localhost:8080/users/1/friends/3"));
+        } catch (Throwable ignored){}
+
+        Collection users = restTemplate.getForEntity(url, Collection.class).getBody();
+
+        Assertions.assertEquals("[{id=1, email=email@ru, login=login, birthday=2022-06-21, name=name, " +
+                        "friends=[2]}, {id=2, email=friend@ru, login=friend, birthday=2021-01-11, " +
+                        "name=friend, friends=[1]}]",
+                users.toString());
+    }
+
+    @Test
+    void shouldGetFriends() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friendOne = new User("friendOne@ru", "friendOne",
+                LocalDate.of(2021, 1, 11), "friendOne");
+
+        makePostRequest(friendOne);
+
+        User friendTwo = new User("friendTwo@ru", "friendTwo",
+                LocalDate.of(2001, 2, 11), "friendTwo");
+
+        makePostRequest(friendTwo);
+
+        makePutRequestToAddFriend(friendOne, URI.create("http://localhost:8080/users/1/friends/2"));
+        makePutRequestToAddFriend(friendTwo, URI.create("http://localhost:8080/users/1/friends/3"));
+
+        String urlUser = "http://localhost:8080/users/1/friends";
+
+        List users = restTemplate.getForEntity(urlUser, List.class).getBody();
+
+        Assertions.assertEquals("[{id=2, email=friendOne@ru, login=friendOne, birthday=2021-01-11, " +
+                        "name=friendOne, friends=[1]}, {id=3, email=friendTwo@ru, login=friendTwo, " +
+                        "birthday=2001-02-11, name=friendTwo, friends=[1]}]",
+                users.toString());
+    }
+
+    @Test
+    void shouldNotGetFriendsByIncorrectId() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friendOne = new User("friendOne@ru", "friendOne",
+                LocalDate.of(2021, 1, 11), "friendOne");
+
+        makePostRequest(friendOne);
+
+        User friendTwo = new User("friendTwo@ru", "friendTwo",
+                LocalDate.of(2001, 2, 11), "friendTwo");
+
+        makePostRequest(friendTwo);
+
+        makePutRequestToAddFriend(friendOne, URI.create("http://localhost:8080/users/1/friends/2"));
+        makePutRequestToAddFriend(friendTwo, URI.create("http://localhost:8080/users/1/friends/3"));
+
+        String urlUser = "http://localhost:8080/users/5/friends";
+
+        boolean isGetFriend = true;
+        try {
+            restTemplate.getForEntity(urlUser, List.class).getBody();
+        } catch (Throwable ex){
+            isGetFriend = false;
+        }
+
+        Assertions.assertFalse(isGetFriend);
+    }
+
+    @Test
+    void shouldGetCommonFriends() {
+        User user = new User("email@ru", "login",
+                LocalDate.of(2022, 6, 21), "name");
+
+        makePostRequest(user);
+
+        User friendOne = new User("friendOne@ru", "friendOne",
+                LocalDate.of(2021, 1, 11), "friendOne");
+
+        makePostRequest(friendOne);
+
+        User friendTwo = new User("friendTwo@ru", "friendTwo",
+                LocalDate.of(2001, 2, 11), "friendTwo");
+
+        makePostRequest(friendTwo);
+
+        makePutRequestToAddFriend(friendOne, URI.create("http://localhost:8080/users/1/friends/2"));
+        makePutRequestToAddFriend(friendTwo, URI.create("http://localhost:8080/users/1/friends/3"));
+        makePutRequestToAddFriend(friendTwo, URI.create("http://localhost:8080/users/2/friends/3"));
+
+        String urlUser = "http://localhost:8080/users/1/friends/common/2";
+
+        List commonFriend = restTemplate.getForEntity(urlUser, List.class).getBody();
+
+        Assertions.assertEquals("[{id=3, email=friendTwo@ru, login=friendTwo, birthday=2001-02-11," +
+                        " name=friendTwo, friends=[1, 2]}]",
+                commonFriend.toString());
     }
 
     Gson makeGson() {
@@ -305,7 +530,25 @@ class UserTest {
                 String.class);
     }
 
-    private User returnCreatedFilmAfterPostRequest(User user) {
+    private void makePutRequestToAddFriend(User user, URI url) {
+        HttpEntity<User> newRequest = new HttpEntity<>(user);
+        restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                newRequest,
+                String.class);
+    }
+
+    private void deleteFriend(User user, URI url) {
+        HttpEntity<User> newRequest = new HttpEntity<>(user);
+        restTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                newRequest,
+                String.class);
+    }
+
+    private User returnCreatedUserAfterPostRequest(User user) {
         HttpEntity<User> request = new HttpEntity<>(user);
         String productCreateResponse = restTemplate.postForObject(url, request, String.class);
         return gson.fromJson(productCreateResponse, User.class);
