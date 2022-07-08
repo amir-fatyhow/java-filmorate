@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,8 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-    private final UserService userService = new UserService(inMemoryUserStorage);
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> allUsers() {
@@ -41,12 +45,12 @@ public class UserController {
     }
 
     @PutMapping
-    public User putUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         return userService.getInMemoryUserStorage().putUser(user);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
-    public void putFriend(@PathVariable Long id, @PathVariable Long friendId) {
+    public void makeFriend(@PathVariable Long id, @PathVariable Long friendId) {
          userService.addFriend(friendId, id);
     }
 

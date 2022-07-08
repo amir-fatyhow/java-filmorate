@@ -15,9 +15,7 @@ public class User {
     private Set<Long> friends = new HashSet<>();
 
     // Для десереализация при GET-запросе
-    public User() {
-        super();
-    }
+    public User() {}
 
     public User(@NonNull String email, @NonNull String login, @NonNull LocalDate birthday, @NonNull String name) {
         this.email = email;
