@@ -87,7 +87,19 @@ public class UserService {
         }
     }
 
-    public UserStorage getInMemoryUserStorage() {
-        return inMemoryUserStorage;
+    public Collection<User> getAllUsers() {
+        return inMemoryUserStorage.getUsers();
+    }
+
+    public User getUser(long id) {
+        return inMemoryUserStorage.getUser(id);
+    }
+
+    public User createUser(User user) {
+        return inMemoryUserStorage.createUser(user);
+    }
+
+    public User updateUser(User user) {
+        return inMemoryUserStorage.putUser(user);
     }
 }

@@ -68,7 +68,19 @@ public class FilmService {
         return films;
     }
 
-    public FilmStorage getInMemoryFilmStorage() {
-        return inMemoryFilmStorage;
+    public Collection<Film> getAllFilms() {
+        return inMemoryFilmStorage.getFilms();
+    }
+
+    public Film getFilm(long id) {
+        return inMemoryFilmStorage.getFilm(id);
+    }
+
+    public Film createFilm(Film film) {
+        return inMemoryFilmStorage.createFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return inMemoryFilmStorage.putFilm(film);
     }
 }

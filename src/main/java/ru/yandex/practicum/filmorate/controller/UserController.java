@@ -21,12 +21,12 @@ public class UserController {
 
     @GetMapping
     public Collection<User> allUsers() {
-        return userService.getInMemoryUserStorage().getUsers();
+        return userService.getAllUsers();
     }
 
     @GetMapping(value = "/{id}")
     public User getUser(@PathVariable Long id) {
-        return userService.getInMemoryUserStorage().getUser(id);
+        return userService.getUser(id);
     }
 
     @GetMapping(value = "/{id}/friends")
@@ -41,12 +41,12 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        return userService.getInMemoryUserStorage().createUser(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        return userService.getInMemoryUserStorage().putUser(user);
+        return userService.updateUser(user);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
