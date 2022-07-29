@@ -1,8 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -10,22 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     public static final String INCORRECT_USER_ID = "Incorrect userId";
     private final Map<Long,User> users = new HashMap<>();
     private long id = 1;
 
-    @Override
-    public Map<Long,User> mapUsers() {
-        return this.users;
+    public  Map<Long, User> mapUsers() {
+        return users;
     }
 
     @Override
-    public User getUser(long id) {
+    public User getUserById(long id) {
         if (users.containsKey(id)) {
             return users.get(id);
         }
+
         throw new NullPointerException(INCORRECT_USER_ID);
     }
 
