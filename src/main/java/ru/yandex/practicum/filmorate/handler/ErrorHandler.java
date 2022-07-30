@@ -16,7 +16,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNullPointerException(final NullPointerException e) {
-        return Map.of(ERROR, "NullPointerException");
+        return Map.of(ERROR, "NullPointerExceptionOrIllegalArgumentException");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleIllegalArgumentException(final IllegalArgumentException e) {
+        return Map.of(ERROR, "NullPointerExceptionOrIllegalArgumentException");
     }
 
     @ExceptionHandler

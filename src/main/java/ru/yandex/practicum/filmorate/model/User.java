@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
+@NoArgsConstructor
 @Data
 public class User {
     private long id;
@@ -15,9 +13,6 @@ public class User {
     private @NonNull LocalDate birthday;
     private @NonNull String name;
     private Map<Long,Boolean> friends = new HashMap<>();
-
-    // Для десереализация при GET-запросе
-    public User() {}
 
     public User(@NonNull String email, @NonNull String login, @NonNull LocalDate birthday,
                 @NonNull String name, Map<Long, Boolean> friends) {

@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+@NoArgsConstructor
 @Data
 public class Film {
     private long id;
@@ -15,9 +16,6 @@ public class Film {
     private @NonNull LocalDate releaseDate;
     private @NonNull int duration;
     private long rate;
-
-    // Для десереализация при GET-запросе
-    public Film() {}
 
     public Film(@NonNull String name, @NonNull String description, @NonNull LocalDate releaseDate,
                 @NonNull int duration, long rate, Set<Long> usersId, MPA mpa, List<Genre> genres) {

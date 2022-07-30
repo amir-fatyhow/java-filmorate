@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.service.databaseH2.FilmDbService;
+import ru.yandex.practicum.filmorate.service.db.FilmDbService;
 
 import java.util.Collection;
 import java.util.List;
