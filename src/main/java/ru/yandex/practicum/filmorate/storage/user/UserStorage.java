@@ -12,7 +12,5 @@ public interface UserStorage {
 
     User putUser(User user);
 
-    Map<Long,User> mapUsers();
-
-    User getUser(long id);
+    User getUserById(long id);
 }

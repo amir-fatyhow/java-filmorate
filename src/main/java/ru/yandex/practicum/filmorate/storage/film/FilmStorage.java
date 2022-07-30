@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface FilmStorage {
-    Map<Long, Film>  mapFilms();
-
     Film createFilm(Film film);
 
     Collection<Film> getFilms();

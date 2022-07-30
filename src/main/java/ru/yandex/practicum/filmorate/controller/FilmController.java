@@ -4,62 +4,89 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.service.db.FilmDbService;
+
 import java.util.Collection;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/films")
+@RequestMapping
 public class FilmController {
-   private final FilmService filmService;
+   private final FilmDbService filmDbService;
 
    @Autowired
-   public FilmController(FilmService filmService) {
-       this.filmService = filmService;
+   public FilmController(FilmDbService filmDbService) {
+       this.filmDbService = filmDbService;
    }
 
-    @GetMapping
+    @GetMapping("/films")
     public Collection<Film> allFilms() {
-        return filmService.getAllFilms();
+        return filmDbService.getAllFilms();
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/films/{id}")
     @ResponseBody
     public Film getFilm(@PathVariable Long id) {
-        return filmService.getFilm(id);
+        return filmDbService.getFilm(id);
     }
 
-    @GetMapping("/popular")
+    @GetMapping(value = "/genres")
+    @ResponseBody
+    public List<Genre> getGenres() {
+        return filmDbService.getGenres();
+    }
+
+    @GetMapping(value = "/genres/{id}")
+    @ResponseBody
+    public Genre getGenre(@PathVariable Long id) {
+        return filmDbService.getGenre(id);
+    }
+
+    @GetMapping(value = "/mpa")
+    @ResponseBody
+    public List<MPA> getRates() {
+        return filmDbService.getMPA();
+    }
+
+    @GetMapping(value = "/mpa/{id}")
+    @ResponseBody
+    public MPA getRate(@PathVariable Long id) {
+        return filmDbService.getMPA(id);
+    }
+
+    @GetMapping("/films/popular")
     @ResponseBody
     public List<Film> getPopularFilms(@RequestParam(required = false) String count) {
         if (count == null) {
-            return filmService.popularFilms(10);
+            return filmDbService.popularFilms(10);
         }
         if (Integer.parseInt(count) <= 0) {
             throw new RuntimeException("Incorrect count");
         }
-        return filmService.popularFilms(Integer.parseInt(count));
+        return filmDbService.popularFilms(Integer.parseInt(count));
     }
 
-    @PostMapping
+    @PostMapping(value = "/films")
     public Film createFilm(@RequestBody Film film) {
-        return filmService.createFilm(film);
+        return filmDbService.createFilm(film);
     }
 
-    @PutMapping
+    @PutMapping(value = "/films")
     public Film updateFilm(@RequestBody Film film) {
-        return filmService.updateFilm(film);
+        return filmDbService.updateFilm(film);
     }
 
-    @PutMapping(value = "/{id}/like/{userId}")
+    @PutMapping(value = "/films/{id}/like/{userId}")
     public void putLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.addLike(userId, id);
+        filmDbService.addLike(userId, id);
     }
 
-    @DeleteMapping(value = "{id}/like/{userId}")
+    @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.removeLike(userId, id);
+        filmDbService.removeLike(userId, id);
     }
 }
 
