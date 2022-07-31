@@ -204,6 +204,19 @@ public class FilmDbStorage implements FilmStorage {
             return film;
     }
 
+    @Override
+    public void removeFilm(Long id) {
+        String deleteAllLikeFilm = "DELETE FROM FILM_USERID_LIKED WHERE FILM_ID = ?";
+        String deleteAllGenreFilm = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
+        String deleteAllMpaFilm = "DELETE FROM FILM_MPA WHERE FILM_ID = ?";
+        String deleteFilm = "DELETE FROM FILMS WHERE FILM_ID = ?";
+
+        jdbcTemplate.update(deleteAllLikeFilm, id);
+        jdbcTemplate.update(deleteAllGenreFilm, id);
+        jdbcTemplate.update(deleteAllMpaFilm, id);
+        jdbcTemplate.update(deleteFilm, id);
+    }
+
     private void validation(Film film) {
         if (film.getName().isBlank()) {
             log.info("Неверно введено название фильма");

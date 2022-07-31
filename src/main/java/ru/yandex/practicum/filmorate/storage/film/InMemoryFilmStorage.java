@@ -63,6 +63,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new NullPointerException(INCORRECT_FILM_ID);
     }
 
+    @Override
+    public void removeFilm(Long id) {
+        films.remove(id);
+    }
+
     private Long getNextId() {
         return id++;
     }

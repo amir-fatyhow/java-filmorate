@@ -98,6 +98,15 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    @Override
+    public void removeUser(Long id) {
+        String deleteUserInFriends = "DELETE FROM FRIENDS WHERE USER_ID = ?";
+        String deleteUser = "DELETE FROM USERS WHERE USER_ID = ?";
+
+        jdbcTemplate.update(deleteUserInFriends, id);
+        jdbcTemplate.update(deleteUser, id);
+    }
+
     private void validation(User user) {
         if (user.getEmail().isEmpty()) {
             log.info("Электронная почта пустая.");

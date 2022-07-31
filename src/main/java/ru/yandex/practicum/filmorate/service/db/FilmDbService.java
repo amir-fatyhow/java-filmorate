@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.storage.genre.db.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.like.db.LikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.db.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.*;
@@ -15,101 +18,56 @@ import java.util.*;
 @Service
 public class FilmDbService {
     private final FilmStorage filmDbStorage;
+    private final GenreDbStorage genreDbStorage;
+    private final MpaDbStorage mpaDbStorage;
+
+    private final LikeDbStorage likeDbStorage;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmDbStorage, JdbcTemplate jdbcTemplate) {
+    public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmDbStorage, JdbcTemplate jdbcTemplate
+            , @Qualifier("GenreDbStorage") GenreDbStorage genreDbStorage
+            , @Qualifier("MpaDbStorage") MpaDbStorage mpaDbStorage
+            , @Qualifier("LikeDbStorage") LikeDbStorage likeDbStorage) {
+
         this.filmDbStorage = filmDbStorage;
         this.jdbcTemplate = jdbcTemplate;
+        this.genreDbStorage = genreDbStorage;
+        this.mpaDbStorage = mpaDbStorage;
+        this.likeDbStorage = likeDbStorage;
     }
 
     public void addLike(long userId, long filmId) {
-        SqlRowSet user = jdbcTemplate.queryForRowSet("SELECT * FROM FILM_USERID_LIKED WHERE FILM_ID = ? " +
-                "AND USER_ID = ?", filmId, userId);
-
-        // проверяем ставил ли пользователь лайк указанному фильму
-        boolean flag = false;
-        while (user.next()) {
-            flag = true;
-        }
-        if (flag) {
-            return;
-        }
-
-        int temp = getMPA(userId,filmId) + 1;
-        String sqlQueryFilmsLike = "INSERT INTO FILM_USERID_LIKED(FILM_ID, USER_ID) VALUES (?, ?)";
-        String sqlQueryFilmsCountLike = "UPDATE FILMS SET RATE = ? WHERE FILM_ID = ?";
-        jdbcTemplate.update(sqlQueryFilmsCountLike, temp, filmId);
-        jdbcTemplate.update(sqlQueryFilmsLike, filmId, userId);
+        likeDbStorage.addLike(userId, filmId);
     }
 
     public void removeLike(long userId, long filmId) {
         if (userId <= 0) {
             throw new IllegalArgumentException("Incorrect userId");
         }
-
-        int temp = getMPA(userId,filmId) - 1;
-
-        String deleteAllLikeFilm = "DELETE FROM FILM_USERID_LIKED WHERE FILM_ID = ? AND USER_ID = ?";
-        String sqlQueryFilmsCountLike = "UPDATE FILMS SET RATE = ? WHERE FILM_ID = ?";
-
-        jdbcTemplate.update(sqlQueryFilmsCountLike, temp, filmId);
-        jdbcTemplate.update(deleteAllLikeFilm, filmId, userId);
+        likeDbStorage.removeLike(userId, filmId);
     }
 
     public List<Genre> getGenres() {
-        SqlRowSet filmRowsGenres = jdbcTemplate.queryForRowSet("SELECT * FROM GENRES");
-        List<Genre> genres = new ArrayList<>();
-
-        while (filmRowsGenres.next()) {
-            Genre genre = new Genre();
-            genre.setId(filmRowsGenres.getInt("GENRE_ID"));
-            genre.setName(filmRowsGenres.getString("GENRE"));
-            genres.add(genre);
-        }
-        return genres;
+        return genreDbStorage.getGenres();
     }
 
     public Genre getGenre(long id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Incorrect id");
         }
-
-        SqlRowSet filmRowsGenres = jdbcTemplate.queryForRowSet("SELECT * FROM GENRES WHERE GENRE_ID = ?", id);
-        Genre genre = new Genre();
-
-        if (filmRowsGenres.next()) {
-            genre.setId(filmRowsGenres.getInt("GENRE_ID"));
-            genre.setName(filmRowsGenres.getString("GENRE"));
-        }
-        return genre;
+        return genreDbStorage.getGenre(id);
     }
 
     public List<MPA> getMPA() {
-        SqlRowSet filmRowsRates = jdbcTemplate.queryForRowSet("SELECT * FROM MPA");
-        List<MPA> genres = new ArrayList<>();
-
-        while (filmRowsRates.next()) {
-            MPA MPA = new MPA();
-            MPA.setId(filmRowsRates.getInt("MPA_ID"));
-            MPA.setName(filmRowsRates.getString("MPA"));
-            genres.add(MPA);
-        }
-        return genres;
+        return mpaDbStorage.getMPA();
     }
 
     public MPA getMPA(long id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Incorrect id");
         }
-        SqlRowSet filmRowsRate = jdbcTemplate.queryForRowSet("SELECT * FROM MPA WHERE MPA_ID = ?", id);
-        MPA MPA = new MPA();
-
-        if (filmRowsRate.next()) {
-            MPA.setId(filmRowsRate.getInt("MPA_ID"));
-            MPA.setName(filmRowsRate.getString("MPA"));
-        }
-        return MPA;
+        return mpaDbStorage.getMPA(id);
     }
 
     public List<Film> popularFilms(int count) {
@@ -151,26 +109,8 @@ public class FilmDbService {
         return filmDbStorage.putFilm(film);
     }
 
-    private int getMPA(long userId, long filmId) {
-        String sqlQueryFilmRemoveLiked = "DELETE FROM FILM_USERID_LIKED WHERE USER_ID = ? AND FILM_ID = ?";
-        jdbcTemplate.update(sqlQueryFilmRemoveLiked, userId, filmId);
-
-        String sqlQueryFilm = "SELECT RATE FROM FILMS WHERE FILM_ID = ?";
-        SqlRowSet sqlQueryFilmRow = jdbcTemplate.queryForRowSet(sqlQueryFilm,
-                filmId);
-        int rate = 0;
-        if (sqlQueryFilmRow.next()) {
-            rate = sqlQueryFilmRow.getInt("RATE");
-        }
-        return rate;
-    }
-
-    private void updateRate(int temp, long filmId, long userId) {
-        String sqlQueryFilmsLike = "INSERT INTO FILM_USERID_LIKED(FILM_ID, USER_ID) VALUES (?, ?)";
-        String sqlQueryFilmsCountLike = "UPDATE FILMS SET RATE = ? WHERE FILM_ID = ?";
-
-        jdbcTemplate.update(sqlQueryFilmsCountLike, temp, filmId);
-        jdbcTemplate.update(sqlQueryFilmsLike, filmId, userId);
+    public void removeFilm(Long id) {
+        filmDbStorage.removeFilm(id);
     }
 
     private void selectAllFromFilms(Film film, SqlRowSet filmRowsFilms ) {
