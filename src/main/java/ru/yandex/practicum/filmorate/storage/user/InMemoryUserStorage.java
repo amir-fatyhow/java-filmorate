@@ -10,23 +10,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     public static final String INCORRECT_USER_ID = "Incorrect userId";
     private final Map<Long,User> users = new HashMap<>();
     private long id = 1;
 
-    @Override
-    public Map<Long,User> mapUsers() {
-        return this.users;
+    public  Map<Long, User> mapUsers() {
+        return users;
     }
 
     @Override
-    public User getUser(long id) {
+    public User getUserById(long id) {
         if (users.containsKey(id)) {
             return users.get(id);
         }
+
         throw new NullPointerException(INCORRECT_USER_ID);
+    }
+
+    @Override
+    public void removeUser(Long id) {
+        users.remove(id);
     }
 
     @Override

@@ -1,18 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+
 import java.util.*;
 
 @Service
 public class FilmService {
     private static final int DEFAULT_AMOUNT_OF_FILMS = 10;
-    private final FilmStorage inMemoryFilmStorage;
+    private final InMemoryFilmStorage inMemoryFilmStorage;
 
     @Autowired
-    public FilmService(FilmStorage inMemoryFilmStorage) {
+    public FilmService(@Qualifier("InMemoryFilmStorage") InMemoryFilmStorage inMemoryFilmStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
     }
 
@@ -44,7 +46,7 @@ public class FilmService {
 
     public List<Film> popularFilms(int count) {
         Comparator<Film> filmComparator =
-                Comparator.comparingLong(Film::getCountLike).reversed();
+                Comparator.comparingLong(Film::getRate).reversed();
 
         List<Film> films = new ArrayList<>(inMemoryFilmStorage.getFilms());
 

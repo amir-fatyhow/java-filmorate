@@ -4,20 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
-@Component
+@Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     public static final LocalDate FILM_BIRTHDAY = LocalDate.of(1895, 12, 28);
     public static final String INCORRECT_FILM_ID = "Incorrect filmId";
     private final Map<Long, Film> films = new HashMap<>();
     private long id = 1;
 
-    @Override
     public  Map<Long, Film> mapFilms() {
         return films;
     }
@@ -63,6 +61,11 @@ public class InMemoryFilmStorage implements FilmStorage {
             return films.get(id);
         }
         throw new NullPointerException(INCORRECT_FILM_ID);
+    }
+
+    @Override
+    public void removeFilm(Long id) {
+        films.remove(id);
     }
 
     private Long getNextId() {
