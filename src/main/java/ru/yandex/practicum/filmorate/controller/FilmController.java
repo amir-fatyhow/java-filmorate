@@ -1,97 +1,125 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.enums.EventType;
+import ru.yandex.practicum.filmorate.enums.Operation;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
+import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.service.db.FilmDbService;
+import ru.yandex.practicum.filmorate.service.EventService;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.LikesService;
 
-import java.util.Collection;
+import javax.validation.Valid;
 import java.util.List;
 
-@Slf4j
 @RestController
-@RequestMapping
+@Slf4j
+@RequiredArgsConstructor
+@RequestMapping("/films")
 public class FilmController {
-   private final FilmDbService filmDbService;
 
-   @Autowired
-   public FilmController(FilmDbService filmDbService) {
-       this.filmDbService = filmDbService;
-   }
+    private final FilmService filmService;
+    private final LikesService likesService;
+    private final EventService eventService;
 
-    @GetMapping("/films")
-    public Collection<Film> allFilms() {
-        return filmDbService.getAllFilms();
+    /**
+     * Добавляем новый Film
+     */
+    @PostMapping
+    public Film addFilm(@Valid @RequestBody Film film) throws FilmNotFound {
+        filmService.addFilm(film);
+        return film;
     }
 
-    @GetMapping(value = "/films/{id}")
-    @ResponseBody
-    public Film getFilm(@PathVariable Long id) {
-        return filmDbService.getFilm(id);
+    /**
+     * Получаем все Film
+     */
+    @GetMapping
+    public ResponseEntity<List<Film>> getAllFilms() {
+        return new ResponseEntity<>(filmService.getAllFilms(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/genres")
-    @ResponseBody
-    public List<Genre> getGenres() {
-        return filmDbService.getGenres();
+    /**
+     * Получаем Film по id
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> getFilmById(@PathVariable long id) throws FilmNotFound {
+        return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/genres/{id}")
-    @ResponseBody
-    public Genre getGenre(@PathVariable Long id) {
-        return filmDbService.getGenre(id);
+    /**
+     * Изменяем существующий Film
+     */
+    @PutMapping
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
+        return ResponseEntity.ok(filmService.updateFilm(film));
     }
 
-    @GetMapping(value = "/mpa")
-    @ResponseBody
-    public List<MPA> getRates() {
-        return filmDbService.getMPA();
+    /**
+     * Удаляем Film по id
+     */
+    @DeleteMapping("/{filmId}")
+    public ResponseEntity<String> deleteFilm(@PathVariable long filmId) throws FilmNotFound {
+        filmService.deleteFilm(filmId);
+        return ResponseEntity.ok("Film delete");
     }
 
-    @GetMapping(value = "/mpa/{id}")
-    @ResponseBody
-    public MPA getRate(@PathVariable Long id) {
-        return filmDbService.getMPA(id);
+    /**
+     * Получаем Film по популярности(количеству like)
+     */
+    @GetMapping("/popular")
+    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+        return ResponseEntity.ok(filmService.getPopularFilms(count));
     }
 
-    @GetMapping("/films/popular")
-    @ResponseBody
-    public List<Film> getPopularFilms(@RequestParam(required = false) String count) {
-        if (count == null) {
-            return filmDbService.popularFilms(10);
-        }
-        if (Integer.parseInt(count) <= 0) {
-            throw new RuntimeException("Incorrect count");
-        }
-        return filmDbService.popularFilms(Integer.parseInt(count));
+    /**
+     * Добавляем Genre в Film
+     */
+    @PostMapping("{id}/genres/set/")
+    public ResponseEntity<String> setGenres(@PathVariable long id, @RequestBody List<Genre> genres) throws FilmNotFound {
+        filmService.setFilmGenres(id, genres);
+        return ResponseEntity.ok("Genres успешно добавлены");
     }
 
-    @PostMapping(value = "/films")
-    public Film createFilm(@RequestBody Film film) {
-        return filmDbService.createFilm(film);
+    /**
+     * Получаем все Genre у Film
+     */
+    @GetMapping("{id}/genres/")
+    public ResponseEntity<List<Genre>> getFilmGenres(@PathVariable long id) throws FilmNotFound {
+        return ResponseEntity.ok(filmService.getFilmGenres(id));
     }
 
-    @PutMapping(value = "/films")
-    public Film updateFilm(@RequestBody Film film) {
-        return filmDbService.updateFilm(film);
+    /**
+     * Добавляем like к Film
+     */
+    @PutMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
+        eventService.addEvent(userId, EventType.LIKE, Operation.ADD, filmId);
+        likesService.addLikeToFilm(userId, filmId);
+        return ResponseEntity.ok("Лайк добавлен");
     }
 
-    @PutMapping(value = "/films/{id}/like/{userId}")
-    public void putLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmDbService.addLike(userId, id);
+    /**
+     * Удаляем like у Film
+     */
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long filmId, @PathVariable long userId) throws UserNotFound, FilmNotFound {
+        eventService.addEvent(userId, EventType.LIKE, Operation.REMOVE, filmId);
+        likesService.deleteLikeFromFilm(filmId, userId);
+        return ResponseEntity.ok("Like delete");
     }
 
-    @DeleteMapping(value = "/films/{id}/like/{userId}")
-    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmDbService.removeLike(userId, id);
-    }
-
-    @DeleteMapping(value = "/films/{id}")
-    public void deleteFilm(@PathVariable Long id) {
-        filmDbService.removeFilm(id);
+    /**
+     * Выводим все Film от заданного Director по годам или лайкам
+     */
+    @GetMapping("/director/{directorId}")
+    public List<Film> getAllFilmsByDirectorSortByYearOrLikes(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.getAllFilmsByDirector(directorId, sortBy);
     }
 }
-

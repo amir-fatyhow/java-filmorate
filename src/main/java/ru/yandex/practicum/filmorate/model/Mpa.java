@@ -7,9 +7,9 @@ import lombok.*;
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id") // Объект определяется только по полю id
 @ToString
-public class Genre {
+public class Mpa {
 
-    private long id;
+    private int id;
     private String name;
 
 }
