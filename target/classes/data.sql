@@ -1,14 +1,14 @@
-INSERT INTO genres(genre_id, genre)
-VALUES ( 1, 'Комедия' ),
-       ( 2, 'Драма' ),
-       ( 3, 'Мультфильм' ),
-       ( 4, 'Триллер' ),
-       ( 5, 'Документальный' ),
-       ( 6, 'Боевик' );
+-- SELECT * FROM FILMS;
 
-INSERT INTO mpa(mpa_id, mpa)
-VALUES ( 1, 'G' ),
-       ( 2, 'PG' ),
-       ( 3, 'PG-13' ),
-       ( 4, 'R' ),
-       ( 5, 'NC-17' );
+MERGE INTO GENRE VALUES (1, 'Комедия');
+MERGE INTO GENRE VALUES (2, 'Драма');
+MERGE INTO GENRE VALUES (3, 'Мультфильм');
+MERGE INTO GENRE VALUES (4, 'Триллер');
+MERGE INTO GENRE VALUES (5, 'Документальный');
+MERGE INTO GENRE VALUES (6, 'Боевик');
+
+MERGE INTO MPA VALUES (1, 'G');
+MERGE INTO MPA VALUES (2, 'PG');
+MERGE INTO MPA VALUES (3, 'PG-13');
+MERGE INTO MPA VALUES (4, 'R');
+MERGE INTO MPA VALUES (5, 'NC-17');

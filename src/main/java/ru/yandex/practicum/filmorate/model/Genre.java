@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.*;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
+@EqualsAndHashCode(of = "id") // Объект определяется только по полю id
+@ToString
 public class Genre {
-    private int id;
+
+    private long id;
     private String name;
+
 }
